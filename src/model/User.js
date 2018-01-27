@@ -4,11 +4,6 @@ var mongoose = require('mongoose');
 var schema = mongoose.Schema;
 
 var UserSchema = new Schema({
-    userId: {
-        type: string,
-        required: true,
-        unique: true
-    },
     username: {
         type: string,
         unique: true
@@ -19,11 +14,11 @@ var UserSchema = new Schema({
     name: {
         firstName: {
             type: string,
-            required: true
+            // required: true
         },
         surname: {
             type: string,
-            required: true
+            // required: true
         }
     },
     emailAddress: {

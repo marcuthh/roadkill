@@ -1,15 +1,15 @@
-import User from '../model/User';
+import Trip from '../model/Trip';
 
 exports.create = function(req, res) {
-    var profile = new User({
+    var trip = new Trip({
         //populate fields...
     });
 
-    profile.save();
+    trip.save();
 
     res.redirect(301, '/');
 }
 
 exports.getUser = function(req, res) {
-    res.render('newuser', { title: 'roadKill - New User'});
+    res.render('newtrip', { title: 'roadKill - New Trip'});
 }
