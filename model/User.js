@@ -7,10 +7,11 @@ var UserSchema = new Schema({
         type: String,
         unique: true
     },
-    //neither name is required by schema
-    //at least one name will need to be provided
-    //this is handled on form validation
+    pwd: String,
     name: {
+        //neither name is required by schema
+        //at least one name will need to be provided
+        //this is handled on form validation
         firstName: {
             type: String,
             // required: true
@@ -38,7 +39,12 @@ var UserSchema = new Schema({
     insuredVehicles: [{
         type: Schema.ObjectId,
         ref: 'Vehicle'
-    }]
+    }],
+    isLoggedIn: {
+        type: Boolean,
+        required: true,
+        default: false
+    }
 })
 
 module.exports = mongoose.model('User', UserSchema);

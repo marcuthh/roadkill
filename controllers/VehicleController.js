@@ -10,6 +10,6 @@ exports.create = function(req, res) {
     res.redirect(301, '/');
 }
 
-exports.getUser = function(req, res) {
+exports.getVehicle = function(req, res) {
     res.render('newvehicle', { title: 'roadKill - New Vehicle'});
 }

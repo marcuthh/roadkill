@@ -29,6 +29,14 @@ var TripSchema = new Schema({
         type: Date,
         required: true
     },
+    createdOn: {
+        type: Date,
+        default: Date.now
+    },
+    lastUpdated: {
+        type: Date,
+        default: Date.now
+    },
     completed: Boolean
 })
 

@@ -17,10 +17,11 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="#">
+        <a class="navbar-brand" href="/">
           <em>
             <strong>roadKill</strong>
-          </em> - take all the fun out of your road-trip!</a>
+          </em> - take all the fun out of your road-trip!
+        </a>
       </div>
     </div>
     <div class="collapse navbar-collapse">
@@ -28,16 +29,36 @@
         <li class="active">
           <a href="/">Home</a>
         </li>
-        <li>
-          <a href="/newuser">Create Account</a>
-        </li>
+        {% if user %}
         <li>
           <a href="/myaccount">My Account</a>
         </li>
         <li>
-          <a href="/myaccount">Create Road-trip</a>
+          <a href="/myaccount">Create New Road-Trip</a>
         </li>
+        {% else %}
+        <li>
+          <a href="/newuser">Create Account</a>
+        </li>
+        {% endif %}
       </ul>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="col-md-12 column">
+      <div class="text-center">
+        <h1>Welcome to roadKill, your road-trip planning &amp; management tool</h1>
+        <p class="lead">
+          Take control of your road-trip and make sure that all your acquaintances keep to schedule. If you do it thoroughly enough,
+          you'll save yourself the hassle next time, as they're unlikely to ever want to travel with you again!
+        </p>
+        <h1>
+          Just
+          <a href="/login">log in</a> or <!--myaccount page will redirect to login if no user detected-->
+          <a href="/newuser">sign up</a> to get started.
+        </h1>
+      </div>
     </div>
   </div>
 </body>
