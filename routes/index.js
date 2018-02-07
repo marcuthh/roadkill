@@ -14,11 +14,17 @@ router.get('/', function (req, res) {
 });
 
 router.get('/login', function (req, res) {
-    res.render('login', { title: 'roadkill - Login'});
+    res.render('login', { title: 'roadkill - Login' });
 });
 
 router.post('/login', function (req, res) {
     userCtrl.loginUser(req, res);
+});
+
+router.get('account/:id', function (req, res) {
+    if (req.params.id) {
+        userCtrl.getUserProfile(req, res);
+    }
 });
 
 router.get('/myaccount', function (req, res) {
@@ -30,7 +36,7 @@ router.get('/myaccount', function (req, res) {
 });
 
 //GET New User page//
-router.get('/newuser', function (req, res) {
+router.get('/userprofile', function (req, res) {
     return userCtrl.getUser(req, res);
 });
 
