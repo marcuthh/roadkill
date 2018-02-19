@@ -5,11 +5,21 @@ var Schema = mongoose.Schema;
 var TripSchema = new Schema({
     //collections
     stops: [{
-        type: Schema.ObjectId,
-        ref: 'Destination'
+        name: {
+            type: String,
+            //required: true
+        },
+        isRequiredStop: Boolean,
+        isRestStop: Boolean,
+        arrivalTime: {
+            type: Date,
+            //required: true,
+            default: Date.now()
+        },
+        hasBeenReached: Boolean
     }],
     vehiclesOnTrip: [{
-        type: Schema.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Vehicle'
     }],
     travellersOnTrip: [{
@@ -19,15 +29,15 @@ var TripSchema = new Schema({
 
     totalDistance: {
         type: Number,
-        required: true
+        //required: true
     },
     totalTime: { //stored in minutes
         type: Number,
-        required: true
+        //required: true
     },
     finalArrivalTime: {
         type: Date,
-        required: true
+        //required: true
     },
     createdOn: {
         type: Date,

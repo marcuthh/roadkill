@@ -21,10 +21,8 @@ router.post('/login', function (req, res) {
     userCtrl.loginUser(req, res);
 });
 
-router.get('account/:id', function (req, res) {
-    if (req.params.id) {
-        userCtrl.getUserProfile(req, res);
-    }
+router.post('/logout', function (req, res) {
+    userCtrl.LogOutUser(req, res);
 });
 
 router.get('/myaccount', function (req, res) {
@@ -38,11 +36,6 @@ router.get('/myaccount', function (req, res) {
 //GET New User page//
 router.get('/userprofile', function (req, res) {
     return userCtrl.getUser(req, res);
-});
-
-//POST New User page//
-router.post('/newuser', function (req, res) {
-    return userCtrl.create(req, res);
 });
 
 //GET New Vehicle page//
