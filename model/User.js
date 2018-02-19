@@ -3,11 +3,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var UserSchema = new Schema({
-    username: {
-        type: String,
-        unique: true,
-        required: true
-    },
+    _id: String,
     pwd: String,
     name: {
         //neither name is required by schema
@@ -39,7 +35,7 @@ var UserSchema = new Schema({
     hasThirdParty: Boolean,
     //array of vehicles that this user is insured on
     insuredVehicles: [{
-        type: Schema.ObjectId,
+        type: String,
         ref: 'Vehicle'
     }],
     isLoggedIn: {

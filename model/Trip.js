@@ -19,7 +19,7 @@ var TripSchema = new Schema({
         hasBeenReached: Boolean
     }],
     vehiclesOnTrip: [{
-        type: Schema.Types.ObjectId,
+        type: String,
         ref: 'Vehicle'
     }],
     travellersOnTrip: [{

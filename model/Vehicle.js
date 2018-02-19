@@ -10,11 +10,7 @@ var SeatSchema = new Schema({
 module.exports = mongoose.model('Seat', SeatSchema);
 
 var VehicleSchema = new Schema({
-    vehicleReg: {
-        type: String,
-        required: true,
-        unique: true
-    },
+    _id: String,
     make: String,
     model: String,
     colour: String,

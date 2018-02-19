@@ -8,7 +8,7 @@ exports.create = function (req, res) {
     //do this regardless of car data provided
     //vehicle id list only handled in update on callback function
     profile = new User({
-        username: req.body.username,
+        _id: req.body.username,
         pwd: req.body.pwd,
         name: {
             firstName: req.body.firstName,
@@ -40,7 +40,7 @@ exports.create = function (req, res) {
                     //build and write the vehicle object to database
                     if (vehicle.reg) {
                         //query database to get the object id of the vehicle
-                        var query = Vehicle.findOne({ vehicleReg: vehicle.reg });
+                        var query = Vehicle.findOne({ _id : vehicle.reg });
                         query.exec(function (err, result) {
                             if (err) {
                                 console.log(`error finding vehicle: ${err}`);
@@ -67,7 +67,7 @@ exports.create = function (req, res) {
                                         });
                                 } else {
                                     vehicle = new Vehicle({
-                                        vehicleReg: vehicle.reg,
+                                        _id: vehicle.reg,
                                         make: vehicle.make,
                                         model: vehicle.model,
                                         colour: vehicle.colour
@@ -183,7 +183,7 @@ exports.create = function (req, res) {
 
 exports.getUserProfile = function (req, res) {
     console.log(`getting profile...`);
-    var query = User.findOne({ username: req.params.id });
+    var query = User.findOne({ _id : req.params.id });
 
     //get the profile associated with the username param
     query.exec(function (err, profile) {
@@ -197,7 +197,7 @@ exports.getUserProfile = function (req, res) {
 
 //get all the vehicles registered to the user
 exports.getUserVehicles = function (req, res) {
-    var query = User.findOne({ username: req.params.id });
+    var query = User.findOne({ _id : req.params.id });
 
     //get the profile associated with the username param
     query.exec(function (err, profile) {
@@ -222,7 +222,7 @@ exports.loginUser = function (req, res) {
     //allow login with either username or email
     var query = User.findOne()
         .or([
-            { username: req.body.username },
+            { _id : req.body.username },
             { emailAddress: req.body.username }
         ]);
 
@@ -291,10 +291,10 @@ exports.LogOutUser = function (req, res) {
                         profile.isLoggedIn = false;
                         req.session.destroy(function (err) {
                             if (err) {
-                                console.log(`unable to log out '${profile.username}'`);
-                                res.send(`unable to log out '${profile.username}'`);
+                                console.log(`unable to log out '${profile._id}'`);
+                                res.send(`unable to log out '${profile._id}'`);
                             } else {
-                                res.send(`'${profile.username}' has been logged out`);
+                                res.send(`'${profile._id}' has been logged out`);
                             }
                         });
                     }

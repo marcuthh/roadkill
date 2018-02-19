@@ -4,7 +4,7 @@ var Schema = mongoose.Schema;
 
 var TravellerSchema = new Schema({
     user: {
-        type: Schema.ObjectId,
+        type: String,
         ref: 'User'
     },
     nonuser: {
