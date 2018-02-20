@@ -4,18 +4,18 @@ var Schema = mongoose.Schema;
 
 var UserSchema = new Schema({
     _id: String,
-    pwd: String,
+    pwd: {
+        type: String,
+        required: true
+    },
     name: {
-        //neither name is required by schema
-        //at least one name will need to be provided
-        //this is handled on form validation
         firstName: {
             type: String,
-            // required: true
+            required: true
         },
         surname: {
             type: String,
-            // required: true
+            required: true
         }
     },
     emailAddress: {
@@ -23,6 +23,7 @@ var UserSchema = new Schema({
         unique: true,
         required: true
     },
+    isSystemAdmin: Boolean,
     address: {
         houseNo: Number,
         street: String,

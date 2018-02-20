@@ -15,6 +15,7 @@ exports.create = function (req, res) {
             surname: req.body.surname,
         },
         emailAddress: req.body.emailAddress,
+        isSystemAdmin: req.body.isSystemAdmin,
         address: {
             houseNo: req.body.houseNo,
             street: req.body.street,
@@ -40,7 +41,7 @@ exports.create = function (req, res) {
                     //build and write the vehicle object to database
                     if (vehicle.reg) {
                         //query database to get the object id of the vehicle
-                        var query = Vehicle.findOne({ _id : vehicle.reg });
+                        var query = Vehicle.findOne({ _id: vehicle.reg });
                         query.exec(function (err, result) {
                             if (err) {
                                 console.log(`error finding vehicle: ${err}`);
@@ -182,8 +183,7 @@ exports.create = function (req, res) {
 }
 
 exports.getUserProfile = function (req, res) {
-    console.log(`getting profile...`);
-    var query = User.findOne({ _id : req.params.id });
+    var query = User.findById(req.params.id);
 
     //get the profile associated with the username param
     query.exec(function (err, profile) {
@@ -197,7 +197,7 @@ exports.getUserProfile = function (req, res) {
 
 //get all the vehicles registered to the user
 exports.getUserVehicles = function (req, res) {
-    var query = User.findOne({ _id : req.params.id });
+    var query = User.findById(req.params.id);
 
     //get the profile associated with the username param
     query.exec(function (err, profile) {
@@ -218,11 +218,228 @@ exports.getUserVehicles = function (req, res) {
     });
 }
 
+exports.addUserVehicle = function (req, res) {
+    var query = User.findById(req.params.id);
+
+    //get the profile associated with the username param
+    query.exec(function (err, profile) {
+        if (err) {
+            console.log(`error getting profile: ${err}`);
+        } else {
+            //handle vehicle data provided
+            if (profile.canDrive && req.body.vehs.length) { //don't allow vehicles to be added if user can't drive
+                for (let i = 0; i < req.body.vehs.length; i++) {
+                    let vehicle = req.body.vehs[i];
+                    //build and write the vehicle object to database
+                    if (vehicle.reg) {
+                        //query database to get the object id of the vehicle
+                        var query = Vehicle.findById(vehicle.reg);
+                        query.exec(function (err, result) {
+                            if (err) {
+                                console.log(`error finding vehicle: ${err}`);
+                                res.send(`error finding vehicle: ${err}`);
+                            } else {
+                                if (result) { //a vehicle exists with a matching reg - use existing record
+                                    //append existing vehicle's unique id to the array
+                                    profile.insuredVehicles.push(result._id);
+                                    User.findByIdAndUpdate(profile._id,
+                                        {
+                                            //update array field in user's document
+                                            insuredVehicles: profile.insuredVehicles
+                                        },
+                                        (err, raw) => {
+                                            if (err) {
+                                                console.log(`error saving user's vehicles: ${err}`);
+                                            } else {
+                                                if (i === (req.body.vehs.length - 1)) {
+                                                    //save updated profile data to session
+                                                    req.session.user = profile;
+                                                    //output completed profile with all vehicles added
+                                                    //^^has to be done in last callback iteration - otherwise vehicles not included
+                                                    res.send(profile);
+                                                }
+                                            }
+                                        });
+                                } else {
+                                    vehicle = new Vehicle({
+                                        _id: vehicle.reg,
+                                        make: vehicle.make,
+                                        model: vehicle.model,
+                                        colour: vehicle.colour
+                                    });
+                                    //default to 5 seats if no value provided
+                                    if (!vehicle.numSeats || vehicle.numSeats === 5) {
+                                        vehicle.seats = [
+                                            {
+                                                position: 1,
+                                                name: "Driver"
+                                            },
+                                            {
+                                                position: 2,
+                                                name: "Passenger"
+                                            },
+                                            {
+                                                position: 3,
+                                                name: "Back Left"
+                                            },
+                                            {
+                                                position: 4,
+                                                name: "Back Right"
+                                            },
+                                            {
+                                                position: 5,
+                                                name: "Middle"
+                                            }
+                                        ];
+                                    } else if (vehicle.numSeats === 2) {
+                                        vehicle.seats = [
+                                            {
+                                                position: 1,
+                                                name: "Driver"
+                                            },
+                                            {
+                                                position: 2,
+                                                name: "Passenger"
+                                            }
+                                        ];
+                                    } else if (vehicle.numSeats === 7) {
+                                        vehicle.seats = [
+                                            {
+                                                position: 1,
+                                                name: "Driver"
+                                            },
+                                            {
+                                                position: 2,
+                                                name: "Passenger"
+                                            },
+                                            {
+                                                position: 3,
+                                                name: "Back Left"
+                                            },
+                                            {
+                                                position: 4,
+                                                name: "Back Right"
+                                            },
+                                            {
+                                                position: 5,
+                                                name: "Boot Left"
+                                            },
+                                            {
+                                                position: 6,
+                                                name: "Boot Right"
+                                            },
+                                            {
+                                                position: 7,
+                                                name: "Middle"
+                                            }
+                                        ];
+                                    }
+                                    //write new vehicle to database
+                                    vehicle.save(function (err) {
+                                        if (err) {
+                                            console.log(`error saving vehicle: ${err}`);
+                                        } else {
+                                            if (vehicle._id) {
+                                                //append new vehicle's unique id to the array
+                                                profile.insuredVehicles.push(vehicle._id);
+                                                //update user's record to include 
+                                                User.findByIdAndUpdate(profile._id,
+                                                    {
+                                                        //update array field in user's document
+                                                        insuredVehicles: profile.insuredVehicles
+                                                    },
+                                                    (err, raw) => {
+                                                        if (err) {
+                                                            console.log(`error saving user's vehicles: ${err}`);
+                                                        } else {
+                                                            if (i === (req.body.vehs.length - 1)) {
+                                                                //save updated profile data to session
+                                                                req.session.user = profile;
+                                                                //output completed profile with all vehicles added
+                                                                //^^has to be done in last callback iteration - otherwise vehicles not included
+                                                                res.send(profile);
+                                                            }
+                                                        }
+                                                    });
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        }
+    });
+}
+
+exports.removeUserVehicle = function (req, res) {
+    if (req.session.user) { //case fire when being used by logged-in user
+        //get user object from session
+        handleVehicleRemove(req, res, req.session.user);
+    } else if (req.params.id) { //case fires when system admin is making change
+        var query = User.findById(req.params.id);
+
+        //get the profile associated with the username param
+        query.exec(function (err, result) {
+            if (err) {
+                console.log(`error getting profile: ${err}`);
+            } else {
+                handleVehicleRemove(req, res, result);
+            }
+        });
+    }
+}
+
+function handleVehicleRemove(req, res, profile) {
+    //check profile object exists
+    if (profile) {
+        console.log(profile.insuredVehicles);
+        //array to store the removed registrations - only used for output
+        let removed = new Array();
+        //loop through collection of provided registrations
+        //and check against user's list of registered vehicles
+        if (req.body.reg.length) {
+            for (let i = 0; i < req.body.reg.length; i++) {
+                let matchPos = profile.insuredVehicles.indexOf(req.body.reg[i]);
+                console.log(`match pos: ${matchPos}`);
+                if (matchPos > -1) { //matching reg found within user's list
+                    console.log(`adding '${profile.insuredVehicles[matchPos]}' to removed list`);
+                    //copy reg to array of removed
+                    removed.push(profile.insuredVehicles[matchPos]);
+                    console.log(`removed: ${removed}`);
+                    //remove element containing matching reg
+                    profile.insuredVehicles.splice(matchPos, 1);
+                    console.log(`remaining: ${profile.insuredVehicles}`);
+                }
+            }
+
+            //once all removals made
+            //write changes to database document
+            User.findByIdAndUpdate(profile._id,
+                {
+                    insuredVehicles: profile.insuredVehicles
+                },
+                (err, result) => {
+                    if (err) {
+                        console.log(`error removing vehicles from '${profile._id}': ${err}`);
+                    } else {
+                        if (req.session.user) {
+                            req.session.user = profile;
+                        }
+                        res.send(`'${profile._id}' has been removed from the insurance of: ${removed}`);
+                    }
+                });
+        }
+    }
+}
+
 exports.loginUser = function (req, res) {
     //allow login with either username or email
     var query = User.findOne()
         .or([
-            { _id : req.body.username },
+            { _id: req.body.username },
             { emailAddress: req.body.username }
         ]);
 
@@ -249,7 +466,7 @@ exports.loginUser = function (req, res) {
                                     profile.isLoggedIn = true;
                                     //store profile id in session
                                     //on subsequent searches, will return with logged-in flag as true
-                                    req.session.userId = profile._id;
+                                    req.session.user = profile;
                                     //output logged-in user data
                                     res.send(profile);
                                 }
@@ -275,8 +492,8 @@ exports.loginUser = function (req, res) {
 }
 
 exports.LogOutUser = function (req, res) {
-    if (req.session.userId) {
-        var query = User.findOne({ _id: req.session.userId });
+    if (req.session.user) {
+        var query = User.findOne({ _id: req.session.user._id });
 
         query.exec(function (err, profile) {
             if (err) {

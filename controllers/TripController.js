@@ -5,7 +5,7 @@ var User = require('../model/User');
 var mongoose = require('mongoose');
 
 exports.getUserTrips = function (req, res) {
-    var query = Trip.find({ travellersOnTrip: req.session.userId });
+    var query = Trip.find({ travellersOnTrip: req.session.user._id });
 
     query.sort({ createdOn: 'desc' })
         .limit(10)

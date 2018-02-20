@@ -12,36 +12,6 @@ router.get('/', function (req, res) {
     res.render('index', { title: 'roadKill - Home' });
 });
 
-router.get('/login', function (req, res) {
-    res.render('login', { title: 'roadkill - Login' });
-});
-
-router.post('/login', function (req, res) {
-    userCtrl.loginUser(req, res);
-});
-
-router.post('/logout', function (req, res) {
-    userCtrl.LogOutUser(req, res);
-});
-
-router.get('/myaccount', function (req, res) {
-    if (req.user) {
-        tripCtrl.list(req, res);
-    } else {
-        res.redirect('/login');
-    }
-});
-
-//GET New User page//
-router.get('/userprofile', function (req, res) {
-    return userCtrl.getUser(req, res);
-});
-
-//GET New Vehicle page//
-router.get('/newvehicle', function (req, res) {
-    return vehicleCtrl.getVehicle(req, res);
-});
-
 //POST New Vehicle page//
 router.post('/newvehicle', function (req, res) {
     return vehicleCtrl.create(req, res);
