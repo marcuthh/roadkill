@@ -52,4 +52,26 @@ router.put('/:id/removeVehicle', function (req, res) {
   }
 });
 
+router.put('/:id/editProfile', function (req, res) {
+  if (req.session.user) {
+    //only allow edits by the user themselves or a system admin
+    if ((req.params.id === req.session.user._id) || req.session.user.isSystemAdmin) {
+      userCtrl.updateUserProfile(req, res);
+    }
+  } else {
+    res.send(`you must be logged in as '${req.params.id}' or a system admin to perform this operation`);
+  }
+});
+
+router.delete('/:id/deleteUser', function (req, res) {
+  if (req.session.user) {
+    //only allow edits by the user themselves or a system admin
+    if ((req.params.id === req.session.user._id) || req.session.user.isSystemAdmin) {
+      userCtrl.deleteUser(req, res);
+    }
+  } else {
+    res.send(`you must be logged in as '${req.params.id}' or a system admin to perform this operation`);
+  }
+});
+
 module.exports = router;

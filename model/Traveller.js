@@ -36,7 +36,7 @@ var TravellerSchema = new Schema({
     isTripLeader: Boolean,
     isCarLeader: Boolean,
     travelCar: {
-        type: Schema.ObjectId,
+        type: String,
         ref: 'Vehicle'
     },
     carSeatPos: {

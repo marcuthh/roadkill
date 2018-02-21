@@ -25,7 +25,7 @@ exports.create = function (req, res) {
         let reqTrav = req.body.travs[i];
         if (reqTrav.user) {
             travellers[i] = new Traveller({
-                user: mongoose.Types.ObjectId(reqTrav.user)
+                user: reqTrav.user
             });
         } else {
             //no user account
@@ -56,8 +56,8 @@ exports.create = function (req, res) {
         if (reqTrav.travelCar) {
             travellers[i].travelCar = reqTrav.travelCar;
             travellers[i].carSeatPos = reqTrav.carSeatPos;
-            if (vehicles.indexOf(mongoose.Types.ObjectId(reqTrav.travelCar)) < 0) {
-                vehicles.push(mongoose.Types.ObjectId(reqTrav.travelCar));
+            if (vehicles.indexOf(reqTrav.travelCar) < 0) {
+                vehicles.push(reqTrav.travelCar);
             }
         }
         travellers[i].save(function (err) {
@@ -90,11 +90,16 @@ exports.create = function (req, res) {
     //     }
     // ];
 
+    let trip = new Trip({
+        travellersOnTrip: travellers,
+        vehiclesOnTrip: vehicles
+    });
+
     trip.save(function (err) {
         if (err) {
             console.log(`error saving trip:  + ${err}`);
         } else {
-
+            res.send(trip);
         }
     });
 }

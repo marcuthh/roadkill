@@ -43,7 +43,8 @@ var UserSchema = new Schema({
         type: Boolean,
         required: true,
         default: false
-    }
+    },
+    isInactive: Boolean
 });
 
 module.exports = mongoose.model('User', UserSchema);
