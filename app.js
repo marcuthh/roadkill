@@ -8,6 +8,7 @@ var session = require('express-session');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
+var trips = require('./routes/trips');
 
 //Mongoose ODM
 var mongoose = require('mongoose');
@@ -42,6 +43,7 @@ app.use(session({
 //routes
 app.use('/', index);
 app.use('/users', users);
+app.use('/trips', trips);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

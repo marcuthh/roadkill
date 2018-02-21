@@ -502,13 +502,11 @@ exports.LogOutUser = function (req, res) {
 
 exports.deleteUser = function (req, res) {
     if (req.params.id === req.session.user._id) {
-        console.log(`self delete`);
         //user deletes their own account
         //removed from any associated vehicles or trips
         //account record remains but is updated to be flagged as inactive
         userDeleteSelf(res, req.params.id);
     } else if (req.session.user.isSystemAdmin) {
-        console.log(`self delete`);
         //user is deleted by an admin
         //removed from any associated vehicles or trips
         //record is deleted and not just flagged as inactive
@@ -660,10 +658,21 @@ function userDeleteSelf(res, id) {
                                                                     isInactive: true
                                                                 },
                                                                 (removeErr, result) => {
-                                                                    console.log(`'${profile._id}' has been removed from roadKill,` +
-                                                                        ` they will no longer appear in any active road-trips`);
-                                                                    res.send(`'${profile._id}' has been removed from roadKill,` +
-                                                                        ` they will no longer appear in any active road-trips`);
+                                                                    if (removeErr) {
+                                                                        console.log(`unable to remove '${profile._id}'`);
+                                                                        res.send(`unable to remove '${profile._id}'`);
+                                                                    } else {
+                                                                        profile.isLoggedIn = false;
+                                                                        req.session.destroy(function (err) {
+                                                                            if (err) {
+                                                                                console.log(`unable to remove '${profile._id}'`);
+                                                                                res.send(`unable to remove '${profile._id}'`);
+                                                                            } else {
+                                                                                res.send(`'${profile._id}' has been removed from roadKill,` +
+                                                                                    ` they will no longer appear in any active road-trips`);
+                                                                            }
+                                                                        });
+                                                                    }
                                                                 }
                                                             );
                                                         }
