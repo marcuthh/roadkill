@@ -6,7 +6,7 @@ var tripCtrl = require('../controllers/TripController');
 //find trips with no filtering
 //should return whole collection
 router.get('/', function (req, res) {
-        return tripCtrl.getAllTrips(req, res);
+    return tripCtrl.getAllTrips(req, res);
 });
 
 //find individual trip - :id param is ObjectId for trip document
@@ -36,6 +36,44 @@ router.post('/search', function (req, res) {
 
 router.post('/newtrip', function (req, res) {
     return tripCtrl.create(req, res);
+});
+
+router.put('/:id/addvehicle', function (req, res) {
+    // if (req.session.user) {
+    //     //only allow edits by the user themselves or a system admin
+    //     if ((req.params.id === req.session.user._id) || req.session.user.isSystemAdmin) {
+    return tripCtrl.addVehicleToTrip(req, res);
+    //     }
+    // } else {
+    //     res.send(`you must be logged in as a trip admin or a system admin to perform this operation`);
+    // }
+});
+
+router.put('/:id/removevehicle', function (req, res) {
+    // if (req.session.user) {
+    //     //only allow edits by the user themselves or a system admin
+    //     if ((req.params.id === req.session.user._id) || req.session.user.isSystemAdmin) {
+    return tripCtrl.removeVehicleFromTrip(req, res);
+    //     }
+    // } else {
+    //     res.send(`you must be logged in as a trip admin or a system admin to perform this operation`);
+    // }
+});
+
+router.put('/:id/addtraveller', function (req, res) {
+    return tripCtrl.addVehicleToTrip(req, res);
+});
+
+router.put('/:id/removetraveller', function (req, res) {
+    return tripCtrl.removeTravellerFromTrip(req, res);
+});
+
+router.delete('/:id', function (req, res) {
+    if (req.session.user) {
+        tripCtrl.deleteTrip(req, res);
+    } else {
+        res.send(`you must be logged in as a trip admin or a system admin to perform this operation`);
+    }
 });
 
 module.exports = router;

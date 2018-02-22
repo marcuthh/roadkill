@@ -48,7 +48,8 @@ var TripSchema = new Schema({
         type: Date,
         default: Date.now
     },
-    completed: Boolean
+    completed: Boolean,
+    isInactive: Boolean
 })
 
 module.exports = mongoose.model('Trip', TripSchema);

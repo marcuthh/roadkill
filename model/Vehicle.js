@@ -17,7 +17,8 @@ var VehicleSchema = new Schema({
     seats: {
         type: [SeatSchema],
         required: true
-    }
+    },
+    isInactive: Boolean
 })
 
 module.exports = mongoose.model('Vehicle', VehicleSchema);

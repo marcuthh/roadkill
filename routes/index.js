@@ -4,7 +4,6 @@ var router = express.Router();
 //controllers
 var userCtrl = require('../controllers/UserController');
 var vehicleCtrl = require('../controllers/VehicleController');
-var travellerCtrl = require('../controllers/TravellerController');
 var tripCtrl = require('../controllers/TripController');
 
 //GET home page//

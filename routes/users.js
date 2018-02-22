@@ -18,13 +18,13 @@ router.post('/newuser', function (req, res) {
 
 router.get('/:id', function (req, res) {
   if (req.params.id) {
-    userCtrl.getUserProfile(req, res);
+    return userCtrl.getUserProfile(req, res);
   }
 });
 
 router.get('/:id/vehicles', function (req, res) {
   if (req.params.id) {
-    userCtrl.getUserVehicles(req, res);
+    return userCtrl.getUserVehicles(req, res);
   }
 });
 
@@ -33,7 +33,7 @@ router.put('/:id/addVehicle', function (req, res) {
   if (req.session.user) {
     //only allow edits by the user themselves or a system admin
     if ((req.params.id === req.session.user._id) || req.session.user.isSystemAdmin) {
-      userCtrl.addUserVehicle(req, res);
+      return userCtrl.addUserVehicle(req, res);
     }
   } else {
     res.send(`you must be logged in as '${req.params.id}' or a system admin to perform this operation`);
@@ -45,7 +45,7 @@ router.put('/:id/removeVehicle', function (req, res) {
   if (req.session.user) {
     //only allow edits by the user themselves or a system admin
     if ((req.params.id === req.session.user._id) || req.session.user.isSystemAdmin) {
-      userCtrl.removeUserVehicle(req, res);
+      return userCtrl.removeUserVehicle(req, res);
     }
   } else {
     res.send(`you must be logged in as '${req.params.id}' or a system admin to perform this operation`);
@@ -56,7 +56,7 @@ router.put('/:id/editProfile', function (req, res) {
   if (req.session.user) {
     //only allow edits by the user themselves or a system admin
     if ((req.params.id === req.session.user._id) || req.session.user.isSystemAdmin) {
-      userCtrl.updateUserProfile(req, res);
+      return userCtrl.updateUserProfile(req, res);
     }
   } else {
     res.send(`you must be logged in as '${req.params.id}' or a system admin to perform this operation`);
@@ -67,7 +67,7 @@ router.delete('/:id/deleteUser', function (req, res) {
   if (req.session.user) {
     //only allow edits by the user themselves or a system admin
     if ((req.params.id === req.session.user._id) || req.session.user.isSystemAdmin) {
-      userCtrl.deleteUser(req, res);
+      return userCtrl.deleteUser(req, res);
     }
   } else {
     res.send(`you must be logged in as '${req.params.id}' or a system admin to perform this operation`);
