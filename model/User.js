@@ -44,7 +44,11 @@ var UserSchema = new Schema({
         required: true,
         default: false
     },
-    isInactive: Boolean
+    isInactive: {
+        type: Boolean,
+        required: true,
+        default: false
+    }
 });
 
 module.exports = mongoose.model('User', UserSchema);

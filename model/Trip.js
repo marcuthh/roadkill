@@ -7,15 +7,16 @@ var TripSchema = new Schema({
     stops: [{
         name: {
             type: String,
-            //required: true
+            required: true
         },
         isRequiredStop: Boolean,
         isRestStop: Boolean,
         arrivalTime: {
             type: Date,
-            //required: true,
-            default: Date.now()
+            required: true,
         },
+        milesInterval: Number, //distance from previous stop to this one
+        minutesInterval: Number, //drive time from previous stop to this one
         hasBeenReached: Boolean
     }],
     vehiclesOnTrip: [{
@@ -26,18 +27,21 @@ var TripSchema = new Schema({
         type: Schema.ObjectId,
         ref: 'Traveller'
     }],
-
     totalDistance: {
         type: Number,
-        //required: true
+        required: true
     },
     totalTime: { //stored in minutes
         type: Number,
-        //required: true
+        required: true
+    },
+    tripStartTime: {
+        type: Date,
+        default: Date.now()
     },
     finalArrivalTime: {
         type: Date,
-        //required: true
+        required: true
     },
     createdOn: {
         type: Date,
@@ -49,7 +53,11 @@ var TripSchema = new Schema({
         default: Date.now
     },
     completed: Boolean,
-    isInactive: Boolean
+    isInactive: {
+        type: Boolean,
+        required: true,
+        default: false
+    }
 })
 
 module.exports = mongoose.model('Trip', TripSchema);

@@ -2,12 +2,12 @@ var Vehicle = require('../model/Vehicle');
 var User = require('../model/User');
 
 exports.getAllVehicles = function (req, res) {
-    let query = Vehicle.findOne({ isInactive: false },
+    let query = Vehicle.find({ isInactive: false },
         (err, vehs) => {
             if (err) {
                 console.log(`error getting vehicle: ${err}`);
             } else {
-                res.send(veh);
+                res.send(vehs);
             }
         }
     );

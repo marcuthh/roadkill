@@ -68,6 +68,14 @@ router.put('/:id/removetraveller', function (req, res) {
     return tripCtrl.removeTravellerFromTrip(req, res);
 });
 
+router.put('/:id/addstop', function (req, res) {
+    return tripCtrl.addStopToTrip(req, res);
+});
+
+router.put('/:id/removestop', function (req, res) {
+    return tripCtrl.removeStopFromTrip(req, res);
+});
+
 router.delete('/:id', function (req, res) {
     if (req.session.user) {
         tripCtrl.deleteTrip(req, res);

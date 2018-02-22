@@ -3,6 +3,7 @@ var Traveller = require('../model/Traveller');
 var User = require('../model/User');
 var Vehicle = require('../model/Vehicle');
 var mongoose = require('mongoose');
+var moment = require('moment');
 
 exports.getAllTrips = function (req, res) {
     query = Trip.find({ isInactive: false }, function (err, trips) {
@@ -559,6 +560,137 @@ exports.removeTravellerFromTrip = function (req, res) {
                         }
                     }
                 );
+            }
+        });
+    }
+}
+
+exports.addStopToTrip = function (req, res) {
+    if (req.params.id) {
+        let query = Trip.findOne({ _id: req.params.id, isInactive: false });
+
+        query.exec(function (err, trip) {
+            if (err) {
+                console.log(`error finding trip: ${err}`);
+            } else {
+                if (req.body.stops.length) {
+                    //loop through stop data and build objects
+                    for (let i = 0; i < req.body.stops.length; i++) {
+                        let stop = {};
+                        stop['name'] = req.body.stops[i].name;
+                        stop['isRequiredStop'] = req.body.stops[i].isRequiredStop;
+                        stop['isRestStop'] = req.body.stops[i].isRestStop;
+                        stop['arrivalTime'] = new Date(req.body.stops[i].arrivalTime);
+                        if (req.body.stops[i].milesInterval) {
+                            stop['milesInterval'] = req.body.stops[i].milesInterval;
+                        } else {
+                            stop['milesInterval'] = Math.floor(Math.random() * 100);
+                        }
+                        //use distance to auto-calc time - assuming national speed limit for journey
+                        let total = stop['milesInterval'] / 70;
+                        let hrsComponent = Math.floor(total) * 60;
+                        let minsComponent = Math.floor((total % 1) * 60);
+                        //assign to stop object
+                        stop['minutesInterval'] = hrsComponent + minsComponent;
+                        stop['hasBeenReached'] = false;
+
+                        console.log(`miles: ${stop['milesInterval']}`);
+                        console.log(`minutes: ${stop['minutesInterval']}`);
+
+                        if (!trip.stops.length || !req.body.stops[i].position) {
+                            trip.stops.push(stop); //default to appending stop to the end of the trip
+                        } else {
+                            if (!req.body.stops[i].position) {
+                                trip.stops.push(stop); //default to appending stop to the end of the trip
+                            } else {
+                                let stopPos = req.body.stops[i].position;
+                                while (trip.stops[(stopPos + 1)].hasBeenReached) {
+                                    stopPos += 1;
+                                }
+                                trip.stops.splice(stopPos, 0, stop);
+                            }
+                        }
+                    }
+
+                    trip.totalDistance = 0;
+                    trip.totalTime = 0;
+                    if (trip.stops.length) { //recalculate route data using existing stops
+                        for (let i = 0; i < trip.stops.length; i++) {
+                            if (i === 0) {
+                                trip.tripStartTime = trip.stops[i].arrivalTime;
+                            }
+                            if (trip.stops[i].milesInterval) {
+                                trip.totalDistance += trip.stops[i].milesInterval;
+                            }
+                            if (trip.stops[i].milesInterval) {
+                                trip.totalTime += trip.stops[i].minutesInterval;
+                            }
+                        }
+                        trip.finalArrivalTime = moment(trip.tripStartTime).add(trip.totalTime, 'm').toDate();
+                    } else { //no stops remaining on trip
+                        trip.tripStartTime = null;
+                        trip.finalArrivalTime = null;
+                    }
+
+                    trip.save(function (err) {
+                        if (err) {
+                            console.log(`error updating stops: ${err}`);
+                        } else {
+                            res.send(trip);
+                        }
+                    })
+                }
+            }
+        });
+    }
+}
+
+exports.removeStopFromTrip = function (req, res) {
+    if (req.params.id) {
+        let query = Trip.findOne({ _id: req.params.id, isInactive: false });
+
+        query.exec(function (err, trip) {
+            if (err) {
+                console.log(`error finding trip: ${err}`);
+            } else {
+                if (req.body.stops.length) {
+                    //loop through stop data and build objects
+                    for (let i = 0; i < req.body.stops.length; i++) {
+                        for (let j = 0; j < trip.stops.length; j++) {
+                            if (req.body.stops[i] === trip.stops[j].name) {
+                                trip.stops.splice(j, 1);
+                            }
+                        }
+                    }
+
+                    trip.totalDistance = 0;
+                    trip.totalTime = 0;
+                    if (trip.stops.length) { //recalculate route data using existing stops
+                        for (let i = 0; i < trip.stops.length; i++) {
+                            if (i === 0) {
+                                trip.tripStartTime = trip.stops[i].arrivalTime;
+                            }
+                            if (trip.stops[i].milesInterval) {
+                                trip.totalDistance += trip.stops[i].milesInterval;
+                            }
+                            if (trip.stops[i].milesInterval) {
+                                trip.totalTime += trip.stops[i].minutesInterval;
+                            }
+                        }
+                        trip.finalArrivalTime = moment(trip.tripStartTime).add(trip.totalTime, 'm').toDate();
+                    } else { //no stops remaining on trip
+                        trip.tripStartTime = null;
+                        trip.finalArrivalTime = Date.now(); //required & can't be null - set default
+                    }
+
+                    trip.save(function (err) {
+                        if (err) {
+                            console.log(`error updating stops: ${err}`);
+                        } else {
+                            res.send(trip);
+                        }
+                    })
+                }
             }
         });
     }
