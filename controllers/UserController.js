@@ -242,26 +242,32 @@ exports.addUserVehicle = function (req, res) {
                                 res.send(`error finding vehicle: ${err}`);
                             } else {
                                 if (result) { //a vehicle exists with a matching reg - use existing record
-                                    //append existing vehicle's unique id to the array
-                                    profile.insuredVehicles.push(result._id);
-                                    User.findByIdAndUpdate(profile._id,
-                                        {
-                                            //update array field in user's document
-                                            insuredVehicles: profile.insuredVehicles
-                                        },
-                                        (err, raw) => {
-                                            if (err) {
-                                                console.log(`error saving user's vehicles: ${err}`);
-                                            } else {
-                                                if (i === (req.body.vehs.length - 1)) {
-                                                    //save updated profile data to session
-                                                    req.session.user = profile;
-                                                    //output completed profile with all vehicles added
-                                                    //^^has to be done in last callback iteration - otherwise vehicles not included
-                                                    res.send(profile);
+                                    if (!result.isInactive) {
+                                        //append existing vehicle's unique id to the array
+                                        profile.insuredVehicles.push(result._id);
+                                        User.findByIdAndUpdate(profile._id,
+                                            {
+                                                //update array field in user's document
+                                                insuredVehicles: profile.insuredVehicles
+                                            },
+                                            (err, raw) => {
+                                                if (err) {
+                                                    console.log(`error saving user's vehicles: ${err}`);
+                                                } else {
+                                                    if (i === (req.body.vehs.length - 1)) {
+                                                        //save updated profile data to session
+                                                        req.session.user = profile;
+                                                        //output completed profile with all vehicles added
+                                                        //^^has to be done in last callback iteration - otherwise vehicles not included
+                                                        res.send(profile);
+                                                    }
                                                 }
                                             }
-                                        });
+                                        );
+                                    } else {
+                                        console.log(`vehicle '${result._id}' does not exist`);
+                                        res.send(`vehicle '${result._id}' does not exist`);
+                                    }
                                 } else {
                                     vehicle = new Vehicle({
                                         _id: vehicle.reg,
@@ -505,7 +511,7 @@ exports.deleteUser = function (req, res) {
         //user deletes their own account
         //removed from any associated vehicles or trips
         //account record remains but is updated to be flagged as inactive
-        userDeleteSelf(res, req.params.id);
+        userDeleteSelf(req, res, req.params.id);
     } else if (req.session.user.isSystemAdmin) {
         //user is deleted by an admin
         //removed from any associated vehicles or trips
@@ -617,7 +623,7 @@ function updateProfile(req, res, profile) {
     );
 }
 
-function userDeleteSelf(res, id) {
+function userDeleteSelf(req, res, id) {
     let query = User.findById(id);
 
     //make sure user profile exists before delete processes start
@@ -641,7 +647,7 @@ function userDeleteSelf(res, id) {
                                 let matchPos = trip.travellersOnTrip.indexOf(travellers[i]._id);
                                 if (matchPos > -1) {
                                     trip.travellersOnTrip.splice(matchPos, 1);
-                                    Trip.update({ _id: trip_id, completed: false },
+                                    Trip.update({ _id: trip._id, completed: false },
                                         {
                                             travellersOnTrip: trip.travellersOnTrip
                                         },

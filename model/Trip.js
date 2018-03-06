@@ -29,11 +29,11 @@ var TripSchema = new Schema({
     }],
     totalDistance: {
         type: Number,
-        required: true
+        //required: true
     },
     totalTime: { //stored in minutes
         type: Number,
-        required: true
+        //required: true
     },
     tripStartTime: {
         type: Date,
@@ -41,7 +41,7 @@ var TripSchema = new Schema({
     },
     finalArrivalTime: {
         type: Date,
-        required: true
+        //required: true
     },
     createdOn: {
         type: Date,
